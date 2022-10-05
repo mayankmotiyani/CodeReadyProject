@@ -47,7 +47,7 @@ class ProductSubCategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self,instance):
         data = super(ProductSubCategorySerializer,self).to_representation(instance)
-        data["category_list"] = ProductSerializer(Product.objects.filter(product_category_id=data['id']),many=True).data
+        data[data['subcategory']] = ProductSerializer(Product.objects.filter(product_category_id=data['id']),many=True).data
         data['url'] = "/get-product/" + "product-category/" +  data['subcategory']
         return data
 
@@ -59,7 +59,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self,instance):
         data = super(ProductCategorySerializer,self).to_representation(instance)
-        data[data['category']] = ProductSubCategoryForProductCategorySerializer(ProductSubCategory.objects.filter(category_id=data['id']),many=True).data
+        data["category_list"] = ProductSubCategoryForProductCategorySerializer(ProductSubCategory.objects.filter(category_id=data['id']),many=True).data
         return data
 
 
