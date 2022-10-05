@@ -10,6 +10,7 @@ from .models import (
 class ProductAdmin(admin.ModelAdmin):
     model = Product
     # list_display = "__all__"
+    exclude = ["product_slug"]
 
     ordering = ['id']
 

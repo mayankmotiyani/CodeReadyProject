@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from djmoney.models.fields import MoneyField
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -34,9 +35,10 @@ class ProductSubCategory(models.Model):
 
 class Product(models.Model):
     owner = models.ForeignKey(User,on_delete=models.CASCADE)
-    product_name = models.CharField(max_length=256)
+    product_name = models.CharField(max_length=256,unique=True)
     product_description = models.TextField(blank=True,null=True)
     product_category = models.ForeignKey(ProductSubCategory,on_delete=models.CASCADE,blank=True,null=True)
+    product_slug = models.SlugField(max_length=256,blank=True,null=True)
     #missing fields : features,compatible_browser,themeforest_files,columns,tags
     product_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
     last_update = models.DateTimeField(auto_now=True,blank=True,null=True)
@@ -51,9 +53,12 @@ class Product(models.Model):
     class Meta:
         verbose_name_plural = "Product"
 
-    # def get_absolute_url(self):
-    #     return reverse('top-product', args=[str(self.id)])
+    def save(self, *args, **kwargs):
+        self.product_slug = slugify(self.product_name)
+        super(Product, self).save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse('get-product-detail', kwargs={'product_slug':self.product_slug})
 
     def __str__(self):
         return "{} : {}".format(self.product_name,self.owner.username.title())
