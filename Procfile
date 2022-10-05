@@ -1,0 +1,1 @@
+web: gunicorn codeready_project.wsgi
